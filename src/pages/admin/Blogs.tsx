@@ -1,0 +1,157 @@
+import { useState, useEffect, useRef } from "react";
+import { Upload, FileText, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { getBlogs, createBlog, BlogPost } from "@/api/blogsApi";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+
+const Blogs = () => {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadBlogs();
+  }, []);
+
+  const loadBlogs = async () => {
+    setLoading(true);
+    const { data, error } = await getBlogs();
+    if (error) {
+      toast({ title: "Error", description: error, variant: "destructive" });
+    } else if (data) {
+      setPosts(data);
+    }
+    setLoading(false);
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleFile = async (file: File) => {
+    if (!file.name.endsWith(".md")) {
+      toast({ title: "Invalid file type", description: "Please upload a Markdown (.md) file.", variant: "destructive" });
+      return;
+    }
+
+    const text = await file.text();
+    const title = file.name.replace(".md", "").replace(/-/g, " ");
+    const preview = text.slice(0, 150) + "...";
+
+    const newPost: Omit<BlogPost, "id"> = {
+      title: title.charAt(0).toUpperCase() + title.slice(1),
+      excerpt: preview,
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      readTime: `${Math.max(1, Math.ceil(text.split(" ").length / 200))} min read`,
+      image: "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?auto=format&fit=crop&w=800&q=80",
+      category: "Tech",
+      slug: file.name.replace(".md", ""),
+      author: "Admin",
+      contentPath: `/blogs/${file.name}`,
+    };
+
+    const { error } = await createBlog(newPost);
+    if (error) {
+      toast({ title: "Error", description: error, variant: "destructive" });
+    } else {
+      toast({ title: "Blog post uploaded", description: `"${file.name}" has been added.` });
+      loadBlogs();
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Blog Management</h1>
+        <p className="text-muted-foreground mt-1">Upload and manage your blog posts ({posts.length} posts)</p>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1">
+          <Card
+            className={cn(
+              "border-2 border-dashed transition-all duration-200 h-[300px] flex flex-col items-center justify-center text-center p-6 cursor-pointer",
+              dragActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+            )}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <input ref={fileInputRef} className="hidden" type="file" accept=".md" onChange={handleChange} />
+            <div className="h-16 w-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+              <Upload className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="font-semibold text-lg mb-1">Upload Article</h3>
+            <p className="text-sm text-muted-foreground mb-4">Drag and drop your .md file here or click to browse</p>
+            <Button variant="secondary" size="sm">Select File</Button>
+          </Card>
+        </div>
+
+        <div className="lg:col-span-2 space-y-4">
+          <h3 className="font-semibold text-lg">Recent Posts</h3>
+          {posts.map((post) => (
+            <Card key={post.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="p-0 flex flex-col sm:flex-row h-full">
+                <div className="sm:w-48 h-48 sm:h-auto bg-gray-100 shrink-0">
+                  <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+                </div>
+                <div className="p-4 flex flex-col flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">{post.category}</span>
+                    <span className="text-xs text-muted-foreground">{post.date}</span>
+                  </div>
+                  <h4 className="font-bold text-lg mb-1 line-clamp-1">{post.title}</h4>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">{post.excerpt}</p>
+                  <div className="flex items-center justify-between mt-auto pt-2 border-t">
+                    <span className="text-xs text-muted-foreground flex items-center">
+                      <FileText className="h-3 w-3 mr-1" />{post.readTime}
+                    </span>
+                    <Button variant="ghost" size="sm" className="h-8 text-xs">Edit Post</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Blogs;

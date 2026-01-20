@@ -1,0 +1,208 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "HP Pavilion 15 Laptop - Intel Core i5, 8GB RAM, 512GB SSD",
+      "category": "laptops",
+      "price": 54999,
+      "originalPrice": 64999,
+      "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80",
+      "badge": "Best Seller",
+      "inStock": true,
+      "specs": [
+        "Intel Core i5-1235U",
+        "8GB DDR4",
+        "512GB NVMe SSD",
+        "15.6\" FHD IPS"
+      ],
+      "description": "Experience power and portability with the HP Pavilion 15 Laptop. Powered by an Intel Core i5 processor and 8GB of RAM, this laptop handles multitasking with ease."
+    },
+    {
+      "id": "2",
+      "name": "Intel Core i7-13700K Processor",
+      "category": "cpu",
+      "price": 42500,
+      "image": "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80",
+      "inStock": true,
+      "specs": [
+        "16 Cores, 24 Threads",
+        "3.4GHz Base Clock",
+        "5.4GHz Boost",
+        "LGA 1700"
+      ],
+      "description": "The Intel Core i7-13700K delivers exceptional performance for gaming and content creation with its hybrid architecture."
+    },
+    {
+      "id": "3",
+      "name": "Logitech MX Master 3 Wireless Mouse",
+      "category": "mouse",
+      "price": 8999,
+      "originalPrice": 10999,
+      "image": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80",
+      "badge": "Sale",
+      "inStock": true,
+      "specs": [
+        "4000 DPI",
+        "USB-C Rechargeable",
+        "Multi-device",
+        "Ergonomic Design"
+      ],
+      "description": "Master your workflow with the Logitech MX Master 3."
+    },
+    {
+      "id": "4",
+      "name": "Samsung 27\" Curved Monitor - Full HD, 75Hz",
+      "category": "monitors",
+      "price": 18499,
+      "image": "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80",
+      "inStock": true,
+      "specs": [
+        "27\" Curved VA Panel",
+        "1920x1080 FHD",
+        "75Hz Refresh",
+        "AMD FreeSync"
+      ],
+      "description": "Immerse yourself in the action with the Samsung 27\" Curved Monitor."
+    },
+    {
+      "id": "5",
+      "name": "ASUS ROG Gaming Laptop - RTX 3060, Ryzen 7",
+      "category": "laptops",
+      "price": 89999,
+      "originalPrice": 99999,
+      "image": "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80",
+      "badge": "Gaming",
+      "inStock": true,
+      "specs": [
+        "AMD Ryzen 7 6800H",
+        "16GB DDR5",
+        "RTX 3060 6GB",
+        "15.6\" 144Hz"
+      ],
+      "description": "Dominate the battlefield with the ASUS ROG Gaming Laptop."
+    },
+    {
+      "id": "6",
+      "name": "Intel Core i5-12400F Processor",
+      "category": "cpu",
+      "price": 15999,
+      "image": "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80",
+      "inStock": true,
+      "specs": [
+        "6 Cores, 12 Threads",
+        "2.5GHz Base Clock",
+        "4.4GHz Boost",
+        "LGA 1700"
+      ],
+      "description": "Build your dream PC with the Intel Core i5-12400F Processor."
+    },
+    {
+      "id": "7",
+      "name": "TP-Link Archer AX50 WiFi 6 Router",
+      "category": "networking",
+      "price": 7499,
+      "image": "https://images.unsplash.com/photo-1544244015-9c72362c2122?auto=format&fit=crop&w=800&q=80",
+      "inStock": true,
+      "specs": [
+        "WiFi 6 AX3000",
+        "Dual Band",
+        "OFDMA",
+        "4 Gigabit Ports"
+      ],
+      "description": "Upgrade your home network with the TP-Link Archer AX50 WiFi 6 Router."
+    },
+    {
+      "id": "8",
+      "name": "HP LaserJet Pro MFP Printer",
+      "category": "printers",
+      "price": 24999,
+      "image": "https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?auto=format&fit=crop&w=800&q=80",
+      "badge": "New",
+      "inStock": false,
+      "specs": [
+        "Print/Scan/Copy",
+        "22 PPM",
+        "Auto Duplex",
+        "Wireless"
+      ],
+      "description": "Simplify your office tasks with the HP LaserJet Pro MFP Printer."
+    }
+  ],
+  "tickets": [
+    {
+      "id": "TCK-1024",
+      "subject": "Laptop overheating issue",
+      "customer": "Rahul Kumar",
+      "priority": "High",
+      "status": "Open",
+      "date": "2024-03-20",
+      "comment": ""
+    },
+    {
+      "id": "TCK-1023",
+      "subject": "Printer driver installation help",
+      "customer": "Priya Singh",
+      "priority": "Medium",
+      "status": "In Progress",
+      "date": "2024-03-19",
+      "comment": "Sent driver download link via email"
+    },
+    {
+      "id": "TCK-1022",
+      "subject": "Inquiry about gaming PC build",
+      "customer": "Amit Patel",
+      "priority": "Low",
+      "status": "Closed",
+      "date": "2024-03-18",
+      "comment": "Provided budget quotation for RTX 4070 build"
+    },
+    {
+      "id": "TCK-1021",
+      "subject": "Warranty claim for monitor",
+      "customer": "Sneha Gupta",
+      "priority": "High",
+      "status": "Open",
+      "date": "2024-03-18",
+      "comment": ""
+    }
+  ],
+  "blogs": [
+    {
+      "id": "1",
+      "slug": "speed-up-old-laptop",
+      "title": "10 Essential Tips to Speed Up Your Old Laptop",
+      "excerpt": "Is your laptop running slow? Learn these proven techniques to breathe new life into your aging device.",
+      "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80",
+      "category": "Tips & Tricks",
+      "author": "Rakesh Mohanty",
+      "date": "Dec 15, 2024",
+      "readTime": "5 min read",
+      "featured": true,
+      "contentPath": "/blogs/speed-up-old-laptop.md"
+    },
+    {
+      "id": "2",
+      "slug": "choose-right-laptop",
+      "title": "How to Choose the Right Laptop for Your Needs",
+      "excerpt": "Confused about which laptop to buy? Our comprehensive guide helps you navigate specs.",
+      "image": "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=800&q=80",
+      "category": "Hardware",
+      "author": "Amit Sahoo",
+      "date": "Dec 12, 2024",
+      "readTime": "8 min read",
+      "contentPath": "/blogs/choose-right-laptop.md"
+    },
+    {
+      "id": "3",
+      "slug": "protecting-from-ransomware",
+      "title": "Protecting Your Computer from Ransomware",
+      "excerpt": "Ransomware attacks are on the rise. Learn how to protect your data.",
+      "image": "https://images.unsplash.com/photo-1563206767-5b18f218e8de?auto=format&fit=crop&w=800&q=80",
+      "category": "Security",
+      "author": "Sunita Das",
+      "date": "Dec 10, 2024",
+      "readTime": "6 min read",
+      "contentPath": "/blogs/protecting-from-ransomware.md"
+    }
+  ]
+}
