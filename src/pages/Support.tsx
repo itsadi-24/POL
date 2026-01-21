@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useSettings } from '@/contexts/SettingsContext';
 
 const faqs = [
   {
@@ -66,6 +67,7 @@ const faqs = [
 
 const Support = () => {
   const { toast } = useToast();
+  const { settings } = useSettings();
   const [ticketSearch, setTicketSearch] = useState('');
   const [formData, setFormData] = useState({
     name: '',
@@ -91,6 +93,8 @@ const Support = () => {
       message: '',
     });
   };
+
+  const isTicketingEnabled = settings?.enableTicketing ?? true;
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -173,147 +177,190 @@ const Support = () => {
         <div className="grid lg:grid-cols-12 gap-12">
           {/* 3. Ticket Form (Main) */}
           <div className="lg:col-span-7">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
-                    <Ticket className="h-5 w-5 text-white" />
+            {isTicketingEnabled ? (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                      <Ticket className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="font-display text-xl font-bold text-slate-900">
+                        Submit a Request
+                      </h2>
+                      <p className="text-slate-500 text-sm">
+                        Fill out the form below for a new repair or inquiry.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="font-display text-xl font-bold text-slate-900">
-                      Submit a Request
-                    </h2>
-                    <p className="text-slate-500 text-sm">
-                      Fill out the form below for a new repair or inquiry.
+                </div>
+
+                <div className="p-6 md:p-8">
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid sm:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="text-slate-700">
+                          Full Name
+                        </Label>
+                        <Input
+                          id="name"
+                          required
+                          className="bg-slate-50 border-slate-200 focus:bg-white transition-colors h-11"
+                          placeholder="John Doe"
+                          value={formData.name}
+                          onChange={(e) =>
+                            setFormData({ ...formData, name: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-slate-700">
+                          Email Address
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          required
+                          className="bg-slate-50 border-slate-200 focus:bg-white transition-colors h-11"
+                          placeholder="john@example.com"
+                          value={formData.email}
+                          onChange={(e) =>
+                            setFormData({ ...formData, email: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-slate-700">
+                          Phone Number
+                        </Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          className="bg-slate-50 border-slate-200 focus:bg-white transition-colors h-11"
+                          placeholder="+91..."
+                          value={formData.phone}
+                          onChange={(e) =>
+                            setFormData({ ...formData, phone: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="category" className="text-slate-700">
+                          Department
+                        </Label>
+                        <Select
+                          value={formData.category}
+                          onValueChange={(value) =>
+                            setFormData({ ...formData, category: value })
+                          }
+                        >
+                          <SelectTrigger className="bg-slate-50 border-slate-200 h-11">
+                            <SelectValue placeholder="Select Category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="repair">
+                              Hardware Repair
+                            </SelectItem>
+                            <SelectItem value="software">
+                              Software Issue
+                            </SelectItem>
+                            <SelectItem value="sales">Product Sales</SelectItem>
+                            <SelectItem value="amc">Corporate AMC</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="subject" className="text-slate-700">
+                        Subject
+                      </Label>
+                      <Input
+                        id="subject"
+                        required
+                        className="bg-slate-50 border-slate-200 focus:bg-white transition-colors h-11"
+                        placeholder="e.g. Laptop Screen Flickering"
+                        value={formData.subject}
+                        onChange={(e) =>
+                          setFormData({ ...formData, subject: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="message" className="text-slate-700">
+                        Description
+                      </Label>
+                      <Textarea
+                        id="message"
+                        required
+                        rows={5}
+                        className="bg-slate-50 border-slate-200 focus:bg-white transition-colors resize-none"
+                        placeholder="Please describe the issue in detail..."
+                        value={formData.message}
+                        onChange={(e) =>
+                          setFormData({ ...formData, message: e.target.value })
+                        }
+                      />
+                    </div>
+
+                    <div className="pt-2">
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full bg-slate-900 hover:bg-slate-800 text-white h-12 shadow-lg shadow-slate-900/10"
+                      >
+                        Submit Ticket <Send className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-slate-400 flex items-center justify-center shadow-lg shadow-slate-400/20">
+                      <Ticket className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="font-display text-xl font-bold text-slate-900">
+                        Ticket Submission Unavailable
+                      </h2>
+                      <p className="text-slate-500 text-sm">
+                        Online ticketing is currently disabled
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 md:p-8">
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+                    <p className="text-slate-700 leading-relaxed">
+                      Support ticketing is currently unavailable. Please contact us directly via phone or email for assistance.
                     </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <a
+                      href="tel:+919853839432"
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+                    >
+                      <Phone className="h-4 w-4" />
+                      Call Support
+                    </a>
+                    <a
+                      href="mailto:support@paradiponline.com"
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors font-medium"
+                    >
+                      <Mail className="h-4 w-4" />
+                      Email Us
+                    </a>
                   </div>
                 </div>
               </div>
-
-              <div className="p-6 md:p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="text-slate-700">
-                        Full Name
-                      </Label>
-                      <Input
-                        id="name"
-                        required
-                        className="bg-slate-50 border-slate-200 focus:bg-white transition-colors h-11"
-                        placeholder="John Doe"
-                        value={formData.name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-slate-700">
-                        Email Address
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        required
-                        className="bg-slate-50 border-slate-200 focus:bg-white transition-colors h-11"
-                        placeholder="john@example.com"
-                        value={formData.email}
-                        onChange={(e) =>
-                          setFormData({ ...formData, email: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-slate-700">
-                        Phone Number
-                      </Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        className="bg-slate-50 border-slate-200 focus:bg-white transition-colors h-11"
-                        placeholder="+91..."
-                        value={formData.phone}
-                        onChange={(e) =>
-                          setFormData({ ...formData, phone: e.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="category" className="text-slate-700">
-                        Department
-                      </Label>
-                      <Select
-                        value={formData.category}
-                        onValueChange={(value) =>
-                          setFormData({ ...formData, category: value })
-                        }
-                      >
-                        <SelectTrigger className="bg-slate-50 border-slate-200 h-11">
-                          <SelectValue placeholder="Select Category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="repair">
-                            Hardware Repair
-                          </SelectItem>
-                          <SelectItem value="software">
-                            Software Issue
-                          </SelectItem>
-                          <SelectItem value="sales">Product Sales</SelectItem>
-                          <SelectItem value="amc">Corporate AMC</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="subject" className="text-slate-700">
-                      Subject
-                    </Label>
-                    <Input
-                      id="subject"
-                      required
-                      className="bg-slate-50 border-slate-200 focus:bg-white transition-colors h-11"
-                      placeholder="e.g. Laptop Screen Flickering"
-                      value={formData.subject}
-                      onChange={(e) =>
-                        setFormData({ ...formData, subject: e.target.value })
-                      }
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="message" className="text-slate-700">
-                      Description
-                    </Label>
-                    <Textarea
-                      id="message"
-                      required
-                      rows={5}
-                      className="bg-slate-50 border-slate-200 focus:bg-white transition-colors resize-none"
-                      placeholder="Please describe the issue in detail..."
-                      value={formData.message}
-                      onChange={(e) =>
-                        setFormData({ ...formData, message: e.target.value })
-                      }
-                    />
-                  </div>
-
-                  <div className="pt-2">
-                    <Button
-                      type="submit"
-                      size="lg"
-                      className="w-full bg-slate-900 hover:bg-slate-800 text-white h-12 shadow-lg shadow-slate-900/10"
-                    >
-                      Submit Ticket <Send className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* 4. FAQ Sidebar */}

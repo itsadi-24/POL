@@ -9,6 +9,7 @@ import {
   HeadphonesIcon,
   BookOpen,
   Lock,
+  Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ const AdminLayout = () => {
   const mainNavItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
     { icon: ShoppingBag, label: "Products", path: "/admin/products" },
+    { icon: Wrench, label: "Services", path: "/admin/services-management" },
     { icon: HeadphonesIcon, label: "Tickets", path: "/admin/tickets" },
     { icon: BookOpen, label: "Blogs", path: "/admin/blogs" },
     { icon: Settings, label: "Settings", path: "/admin/settings" },

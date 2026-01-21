@@ -1,33 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Save } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const Settings = () => {
   const { toast } = useToast();
+  const { settings: globalSettings, loading, updateSettings } = useSettings();
   
   const [settings, setSettings] = useState({
     showScrollingHeadline: true,
-
     showSidebar: true,
-    enableWhatsApp: true,
-    enablePhoneContact: true,
     enableTicketing: true,
     maintenanceMode: false,
   });
+
+  const [saving, setSaving] = useState(false);
+
+  // Load settings from context when available
+  useEffect(() => {
+    if (globalSettings) {
+      setSettings(globalSettings);
+    }
+  }, [globalSettings]);
 
   const handleToggle = (key: keyof typeof settings) => {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleSave = () => {
-    toast({
-      title: "Settings saved",
-      description: "Your settings have been updated successfully.",
-    });
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await updateSettings(settings);
+      toast({
+        title: "Settings saved",
+        description: "Your settings have been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const featureToggles = [
@@ -36,24 +56,10 @@ const Settings = () => {
       title: "Scrolling Headline",
       description: "Show the scrolling news ticker at the top of the page",
     },
-
     {
       key: "showSidebar" as const,
       title: "Right Sidebar",
       description: "Show the sidebar on applicable pages",
-    },
-  ];
-
-  const contactToggles = [
-    {
-      key: "enableWhatsApp" as const,
-      title: "WhatsApp Contact",
-      description: "Enable WhatsApp button for customer inquiries",
-    },
-    {
-      key: "enablePhoneContact" as const,
-      title: "Phone Contact",
-      description: "Show phone number for direct calls",
     },
     {
       key: "enableTicketing" as const,
@@ -70,6 +76,17 @@ const Settings = () => {
     },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Page Header */}
@@ -80,9 +97,9 @@ const Settings = () => {
             Manage website features and toggles
           </p>
         </div>
-        <Button onClick={handleSave} className="gap-2">
+        <Button onClick={handleSave} className="gap-2" disabled={saving}>
           <Save className="h-4 w-4" />
-          Save Changes
+          {saving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
 
@@ -96,38 +113,6 @@ const Settings = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           {featureToggles.map((toggle) => (
-            <div
-              key={toggle.key}
-              className="flex items-center justify-between py-3 border-b last:border-0"
-            >
-              <div className="space-y-0.5">
-                <Label htmlFor={toggle.key} className="text-base font-medium">
-                  {toggle.title}
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  {toggle.description}
-                </p>
-              </div>
-              <Switch
-                id={toggle.key}
-                checked={settings[toggle.key]}
-                onCheckedChange={() => handleToggle(toggle.key)}
-              />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Contact Options */}
-      <Card className="border-0 shadow-sm">
-        <CardHeader>
-          <CardTitle>Contact Options</CardTitle>
-          <CardDescription>
-            Configure customer contact methods
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {contactToggles.map((toggle) => (
             <div
               key={toggle.key}
               className="flex items-center justify-between py-3 border-b last:border-0"

@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { FaWhatsapp } from 'react-icons/fa';
+import { useSettings } from '@/contexts/SettingsContext';
 
 interface SidebarProps {
   enabled?: boolean;
@@ -23,6 +24,8 @@ interface SidebarProps {
 
 export function Sidebar({ enabled = true }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { settings } = useSettings();
+  const isTicketingEnabled = settings?.enableTicketing ?? true;
 
   if (!enabled) return null;
 
@@ -211,17 +214,19 @@ export function Sidebar({ enabled = true }: SidebarProps) {
           </div>
 
           {/* Sticky Footer CTA */}
-          <div className="p-6 bg-white border-t border-slate-100">
-            <Button
-              className="w-full h-12 text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 bg-primary hover:bg-primary/90 text-white rounded-xl"
-              asChild
-            >
-              <Link to="/support" onClick={() => setIsOpen(false)}>
-                Create Support Ticket
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Link>
-            </Button>
-          </div>
+          {isTicketingEnabled && (
+            <div className="p-6 bg-white border-t border-slate-100">
+              <Button
+                className="w-full h-12 text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 bg-primary hover:bg-primary/90 text-white rounded-xl"
+                asChild
+              >
+                <Link to="/support" onClick={() => setIsOpen(false)}>
+                  Create Support Ticket
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </aside>
     </>

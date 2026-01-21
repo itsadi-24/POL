@@ -1,4 +1,199 @@
 {
+  "settings": {
+    "showScrollingHeadline": true,
+    "showSidebar": true,
+    "enableTicketing": true,
+    "maintenanceMode": false
+  },
+  "services": [
+    {
+      "id": "1",
+      "title": "Hardware Repair",
+      "description": "Expert diagnosis for laptops & desktops. We fix screens, keyboards, and motherboards with precision.",
+      "icon": "Wrench",
+      "features": [
+        "Screen replacement",
+        "Keyboard repair",
+        "Battery replacement",
+        "Port repairs"
+      ],
+      "price": "From ₹500",
+      "color": "blue",
+      "popular": true,
+      "order": 1,
+      "enabled": true
+    },
+    {
+      "id": "2",
+      "title": "Software Solutions",
+      "description": "OS installation, virus removal, and speed optimization to make your computer run like new.",
+      "icon": "Monitor",
+      "features": [
+        "OS installation",
+        "Virus removal",
+        "Driver updates",
+        "Speed tuning"
+      ],
+      "price": "From ₹300",
+      "color": "emerald",
+      "popular": false,
+      "order": 2,
+      "enabled": true
+    },
+    {
+      "id": "3",
+      "title": "Custom PC Builds",
+      "description": "Tailor-made rigs for gaming or workstations. We handle component selection and assembly.",
+      "icon": "Cpu",
+      "features": [
+        "Component selection",
+        "Pro Assembly",
+        "Cable management",
+        "Stress testing"
+      ],
+      "price": "From ₹2,000",
+      "color": "purple",
+      "popular": false,
+      "order": 3,
+      "enabled": true
+    },
+    {
+      "id": "4",
+      "title": "On-site Support",
+      "description": "We come to you. Professional repairs and network setup for homes and offices.",
+      "icon": "Truck",
+      "features": [
+        "Home visits",
+        "Office support",
+        "Network setup",
+        "Printer config"
+      ],
+      "price": "From ₹800",
+      "color": "orange",
+      "popular": false,
+      "order": 4,
+      "enabled": true
+    },
+    {
+      "id": "5",
+      "title": "Data Recovery",
+      "description": "Advanced recovery for lost files from damaged hard drives, SSDs, and USB sticks.",
+      "icon": "HardDrive",
+      "features": [
+        "HDD recovery",
+        "SSD recovery",
+        "Corrupted files",
+        "Formatted drives"
+      ],
+      "price": "From ₹1,500",
+      "color": "rose",
+      "popular": false,
+      "order": 5,
+      "enabled": true
+    },
+    {
+      "id": "6",
+      "title": "Network Setup",
+      "description": "Seamless connectivity solutions. WiFi optimization, LAN cabling, and router configuration.",
+      "icon": "Network",
+      "features": [
+        "WiFi setup",
+        "LAN cabling",
+        "Router config",
+        "Security setup"
+      ],
+      "price": "From ₹1,000",
+      "color": "cyan",
+      "popular": false,
+      "order": 6,
+      "enabled": true
+    },
+    {
+      "id": "7",
+      "title": "Chip Level Motherboard Repair",
+      "description": "Advanced chip-level diagnostics and repair for motherboards. We fix complex hardware issues at component level.",
+      "icon": "Cpu",
+      "features": [
+        "Component-level repair",
+        "BGA reballing",
+        "Circuit diagnostics",
+        "Chip replacement"
+      ],
+      "price": "From ₹2,500",
+      "color": "purple",
+      "popular": false,
+      "order": 7,
+      "enabled": true
+    },
+    {
+      "id": "8",
+      "title": "CCTV Installation",
+      "description": "Professional CCTV camera installation and monitoring systems for homes and businesses.",
+      "icon": "Monitor",
+      "features": [
+        "Camera installation",
+        "DVR/NVR setup",
+        "Remote monitoring",
+        "Maintenance support"
+      ],
+      "price": "From ₹5,000",
+      "color": "orange",
+      "popular": false,
+      "order": 8,
+      "enabled": true
+    },
+    {
+      "id": "9",
+      "title": "Website Development",
+      "description": "Custom website design and development for businesses. Responsive, modern, and SEO-optimized websites.",
+      "icon": "Monitor",
+      "features": [
+        "Custom design",
+        "Responsive layout",
+        "SEO optimization",
+        "Hosting support"
+      ],
+      "price": "From ₹15,000",
+      "color": "emerald",
+      "popular": false,
+      "order": 9,
+      "enabled": true
+    },
+    {
+      "id": "10",
+      "title": "GPS Tracking Systems",
+      "description": "Vehicle GPS tracking installation and monitoring. Real-time location tracking for cars and commercial vehicles.",
+      "icon": "Network",
+      "features": [
+        "GPS installation",
+        "Real-time tracking",
+        "Mobile app access",
+        "Route history"
+      ],
+      "price": "From ₹3,500",
+      "color": "cyan",
+      "popular": false,
+      "order": 10,
+      "enabled": true
+    },
+    {
+      "id": "11",
+      "title": "Laptop Repairs",
+      "description": "Complete laptop repair services including hardware and software issues. All brands supported.",
+      "icon": "Wrench",
+      "features": [
+        "Screen replacement",
+        "Hinge repair",
+        "Charging port fix",
+        "Performance upgrade"
+      ],
+      "price": "From ₹600",
+      "color": "blue",
+      "popular": false,
+      "order": 11,
+      "enabled": true
+    }
+  ],
   "products": [
     {
       "id": "1",
@@ -136,7 +331,7 @@
       "priority": "High",
       "status": "Open",
       "date": "2024-03-20",
-      "comment": ""
+      "comment": "hi"
     },
     {
       "id": "TCK-1023",

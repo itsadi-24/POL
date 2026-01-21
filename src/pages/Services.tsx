@@ -1,5 +1,5 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Wrench,
   Monitor,
@@ -13,100 +13,38 @@ import {
   CheckCircle2,
   ArrowRight,
   Phone,
-  MessageCircle,
   Sparkles,
+  LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FaWhatsapp } from 'react-icons/fa';
+import { getServices, type Service } from '@/api/servicesApi';
 
-const services = [
-  {
-    icon: Wrench,
-    title: 'Hardware Repair',
-    description:
-      'Expert diagnosis for laptops & desktops. We fix screens, keyboards, and motherboards with precision.',
-    features: [
-      'Screen replacement',
-      'Keyboard repair',
-      'Battery replacement',
-      'Port repairs',
-    ],
-    colorClass:
-      'text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white',
-    price: 'From ₹500',
-    popular: true,
-  },
-  {
-    icon: Monitor,
-    title: 'Software Solutions',
-    description:
-      'OS installation, virus removal, and speed optimization to make your computer run like new.',
-    features: [
-      'OS installation',
-      'Virus removal',
-      'Driver updates',
-      'Speed tuning',
-    ],
-    colorClass:
-      'text-emerald-600 bg-emerald-50 group-hover:bg-emerald-600 group-hover:text-white',
-    price: 'From ₹300',
-  },
-  {
-    icon: Cpu,
-    title: 'Custom PC Builds',
-    description:
-      'Tailor-made rigs for gaming or workstations. We handle component selection and assembly.',
-    features: [
-      'Component selection',
-      'Pro Assembly',
-      'Cable management',
-      'Stress testing',
-    ],
-    colorClass:
-      'text-purple-600 bg-purple-50 group-hover:bg-purple-600 group-hover:text-white',
-    price: 'From ₹2,000',
-  },
-  {
-    icon: Truck,
-    title: 'On-site Support',
-    description:
-      'We come to you. Professional repairs and network setup for homes and offices.',
-    features: [
-      'Home visits',
-      'Office support',
-      'Network setup',
-      'Printer config',
-    ],
-    colorClass:
-      'text-orange-600 bg-orange-50 group-hover:bg-orange-600 group-hover:text-white',
-    price: 'From ₹800',
-  },
-  {
-    icon: HardDrive,
-    title: 'Data Recovery',
-    description:
-      'Advanced recovery for lost files from damaged hard drives, SSDs, and USB sticks.',
-    features: [
-      'HDD recovery',
-      'SSD recovery',
-      'Corrupted files',
-      'Formatted drives',
-    ],
-    colorClass:
-      'text-rose-600 bg-rose-50 group-hover:bg-rose-600 group-hover:text-white',
-    price: 'From ₹1,500',
-  },
-  {
-    icon: Network,
-    title: 'Network Setup',
-    description:
-      'Seamless connectivity solutions. WiFi optimization, LAN cabling, and router configuration.',
-    features: ['WiFi setup', 'LAN cabling', 'Router config', 'Security setup'],
-    colorClass:
-      'text-cyan-600 bg-cyan-50 group-hover:bg-cyan-600 group-hover:text-white',
-    price: 'From ₹1,000',
-  },
-];
+// Helper function to map icon names to icon components
+const getIconComponent = (iconName: string): LucideIcon => {
+  const iconMap: Record<string, LucideIcon> = {
+    Wrench,
+    Monitor,
+    Cpu,
+    Truck,
+    HardDrive,
+    Network,
+  };
+  return iconMap[iconName] || Wrench;
+};
+
+// Helper function to map color names to Tailwind classes
+const getColorClasses = (color: string) => {
+  const colorMap: Record<string, string> = {
+    blue: 'text-blue-600 bg-blue-50 group-hover:bg-blue-600 group-hover:text-white',
+    emerald: 'text-emerald-600 bg-emerald-50 group-hover:bg-emerald-600 group-hover:text-white',
+    purple: 'text-purple-600 bg-purple-50 group-hover:bg-purple-600 group-hover:text-white',
+    orange: 'text-orange-600 bg-orange-50 group-hover:bg-orange-600 group-hover:text-white',
+    rose: 'text-rose-600 bg-rose-50 group-hover:bg-rose-600 group-hover:text-white',
+    cyan: 'text-cyan-600 bg-cyan-50 group-hover:bg-cyan-600 group-hover:text-white',
+  };
+  return colorMap[color] || colorMap.blue;
+};
 
 const whyChooseUs = [
   {
@@ -132,6 +70,34 @@ const whyChooseUs = [
 ];
 
 const Services = () => {
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      setLoading(true);
+      const { data, error } = await getServices();
+      if (data && !error) {
+        // Filter enabled services and sort by order
+        const enabledServices = data.filter(s => s.enabled).sort((a, b) => a.order - b.order);
+        setServices(enabledServices);
+      }
+      setLoading(false);
+    };
+    fetchServices();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Loading services...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* 1. Hero Section */}
@@ -170,69 +136,74 @@ const Services = () => {
       <section className="py-20 -mt-20 relative z-20">
         <div className="container mx-auto px-4 mt-20">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, index) => (
-              <div
-                key={service.title}
-                className={cn(
-                  'group relative flex flex-col p-8 bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50',
-                  'hover:shadow-2xl hover:shadow-slate-300/50 hover:-translate-y-1 transition-all duration-300 ease-out',
-                  service.popular && 'ring-2 ring-blue-500 ring-offset-2'
-                )}
-              >
-                {service.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-lg">
-                    Most Popular
-                  </div>
-                )}
+            {services.map((service) => {
+              const IconComponent = getIconComponent(service.icon);
+              const colorClass = getColorClasses(service.color);
+              
+              return (
+                <div
+                  key={service.id}
+                  className={cn(
+                    'group relative flex flex-col p-8 bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50',
+                    'hover:shadow-2xl hover:shadow-slate-300/50 hover:-translate-y-1 transition-all duration-300 ease-out',
+                    service.popular && 'ring-2 ring-blue-500 ring-offset-2'
+                  )}
+                >
+                  {service.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-lg">
+                      Most Popular
+                    </div>
+                  )}
 
-                <div className="flex justify-between items-start mb-6">
-                  <div
-                    className={cn(
-                      'h-14 w-14 rounded-2xl flex items-center justify-center transition-colors duration-300',
-                      service.colorClass
-                    )}
-                  >
-                    <service.icon className="h-7 w-7" />
+                  <div className="flex justify-between items-start mb-6">
+                    <div
+                      className={cn(
+                        'h-14 w-14 rounded-2xl flex items-center justify-center transition-colors duration-300',
+                        colorClass
+                      )}
+                    >
+                      <IconComponent className="h-7 w-7" />
+                    </div>
+                    <div className="bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
+                      <span className="text-sm font-bold text-slate-700">
+                        {service.price}
+                      </span>
+                    </div>
                   </div>
-                  <div className="bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
-                    <span className="text-sm font-bold text-slate-700">
-                      {service.price}
-                    </span>
+
+                  <h3 className="font-display text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">
+                    {service.title}
+                  </h3>
+
+                  <p className="text-slate-500 mb-6 leading-relaxed text-sm">
+                    {service.description}
+                  </p>
+
+                  <div className="mt-auto">
+                    <div className="w-full h-px bg-slate-100 mb-4" />
+                    <ul className="grid grid-cols-2 gap-y-2 gap-x-4 mb-6">
+                      {(service.features || []).map((feature, idx) => (
+                        <li
+                          key={idx}
+                          className="flex items-center gap-2 text-xs font-medium text-slate-600"
+                        >
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                          <span className="truncate">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between hover:bg-slate-50 group/btn border border-slate-200"
+                    >
+                      Book Service
+                      <ArrowRight className="h-4 w-4 text-slate-400 group-hover/btn:translate-x-1 group-hover/btn:text-blue-600 transition-all" />
+                    </Button>
                   </div>
                 </div>
-
-                <h3 className="font-display text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">
-                  {service.title}
-                </h3>
-
-                <p className="text-slate-500 mb-6 leading-relaxed text-sm">
-                  {service.description}
-                </p>
-
-                <div className="mt-auto">
-                  <div className="w-full h-px bg-slate-100 mb-4" />
-                  <ul className="grid grid-cols-2 gap-y-2 gap-x-4 mb-6">
-                    {service.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-center gap-2 text-xs font-medium text-slate-600"
-                      >
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                        <span className="truncate">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between hover:bg-slate-50 group/btn border border-slate-200"
-                  >
-                    Book Service
-                    <ArrowRight className="h-4 w-4 text-slate-400 group-hover/btn:translate-x-1 group-hover/btn:text-blue-600 transition-all" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -269,11 +240,10 @@ const Services = () => {
         </div>
       </section>
 
-      {/* 4. CTA Section - Dark Card Style */}
+      {/* 4. CTA Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto">
           <div className="relative rounded-3xl bg-slate-900 px-6 py-16 sm:px-12 sm:py-20 md:py-24 overflow-hidden text-center shadow-2xl">
-            {/* Background Pattern */}
             <div className="absolute top-0 left-0 w-full h-full opacity-30">
               <div className="absolute right-0 top-0 -translate-y-12 translate-x-12 w-64 h-64 bg-blue-500 rounded-full blur-[80px]"></div>
               <div className="absolute left-0 bottom-0 translate-y-12 -translate-x-12 w-64 h-64 bg-purple-500 rounded-full blur-[80px]"></div>
