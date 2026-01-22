@@ -84,15 +84,15 @@ const AdminLayout = () => {
 
   // Normal admin layout once PIN is validated
   return (
-    <div className="min-h-screen flex bg-background">
-      {/* Sidebar */}
+    <div className="h-screen flex overflow-hidden bg-background">
+      {/* Sidebar - Fixed */}
       <aside
         className={cn(
-          "border-r border-border bg-card transition-all duration-200",
+          "border-r border-border bg-card transition-all duration-200 flex flex-col h-screen",
           sidebarOpen ? "w-64" : "w-16"
         )}
       >
-        <div className="h-16 flex items-center justify-between px-4 border-b border-border">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-border flex-shrink-0">
           <Link to="/" className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg gradient-primary flex items-center justify-center">
               <LayoutDashboard className="h-4 w-4 text-primary-foreground" />
@@ -114,7 +114,7 @@ const AdminLayout = () => {
           </button>
         </div>
 
-        <nav className="px-2 py-4 text-sm">
+        <nav className="px-2 py-4 text-sm overflow-y-auto flex-1">
           <div className="space-y-1">
             {mainNavItems.map((item) => {
               const Icon = item.icon;
@@ -138,9 +138,10 @@ const AdminLayout = () => {
         </nav>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 min-h-screen bg-gradient-subtle">
-        <div className="border-b border-border bg-card/80 backdrop-blur">
+      {/* Main content - Scrollable */}
+      <main className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Header - Fixed */}
+        <div className="border-b border-border bg-card/80 backdrop-blur flex-shrink-0">
           <div className="px-4 py-3 flex items-center justify-between">
             <div>
               <h1 className="text-sm font-semibold text-foreground">
@@ -159,8 +160,11 @@ const AdminLayout = () => {
           </div>
         </div>
 
-        <div className="p-4 lg:p-6">
-          <Outlet />
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto bg-gradient-subtle">
+          <div className="p-4 lg:p-6">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>
