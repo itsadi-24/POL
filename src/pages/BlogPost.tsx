@@ -13,11 +13,7 @@ import {
   BookmarkPlus,
   ChevronRight,
 } from 'lucide-react';
-import {
-  getBlogBySlug,
-  blogPosts,
-  BlogPost as BlogPostType,
-} from '@/data/blogData';
+import { getBlogs, getBlogBySlug, BlogPost as BlogPostType } from '@/api/blogsApi';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -25,8 +21,26 @@ const BlogPost = () => {
   const [content, setContent] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [post, setPost] = useState<BlogPostType | null>(null);
+  const [blogPosts, setBlogPosts] = useState<BlogPostType[]>([]);
 
-  const post = slug ? getBlogBySlug(slug) : undefined;
+  // Fetch all blogs and find the current post
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      const { data, error: fetchError } = await getBlogs();
+      if (data && !fetchError) {
+        setBlogPosts(data);
+        const foundPost = data.find(p => p.slug === slug);
+        setPost(foundPost || null);
+        if (!foundPost) {
+          setError('Blog post not found');
+        }
+      } else {
+        setError('Failed to load blogs');
+      }
+    };
+    fetchBlogs();
+  }, [slug]);
 
   // Get related posts (same category, excluding current)
   const relatedPosts = post
@@ -125,7 +139,6 @@ const BlogPost = () => {
                 </div>
                 <div>
                   <p className="text-white font-medium">{post.author}</p>
-                  <p className="text-slate-400">{post.role || 'Author'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 text-slate-400">

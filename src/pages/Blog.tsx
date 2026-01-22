@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,13 +14,32 @@ import {
   TrendingUp,
   ChevronRight,
   Mail,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { blogPosts, categories } from '@/data/blogData';
+import { getBlogs, BlogPost } from '@/api/blogsApi';
 
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch blogs from API
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      setLoading(true);
+      const { data, error } = await getBlogs();
+      if (data && !error) {
+        setBlogPosts(data);
+      }
+      setLoading(false);
+    };
+    fetchBlogs();
+  }, []);
+
+  // Extract unique categories from blog posts
+  const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))];
 
   const filteredPosts = blogPosts.filter((post) => {
     const matchesCategory =
@@ -35,6 +54,18 @@ const Blog = () => {
   const regularPosts = filteredPosts.filter(
     (post) => !post.featured || selectedCategory !== 'All'
   );
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-slate-600">Loading blog posts...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -147,9 +178,6 @@ const Blog = () => {
                     <div>
                       <p className="text-sm font-bold text-slate-900">
                         {featuredPost.author}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {featuredPost.role || 'Editor'}
                       </p>
                     </div>
                   </div>

@@ -1,8 +1,18 @@
 import { useState, useEffect, useRef } from "react";
-import { Upload, FileText, Loader2 } from "lucide-react";
+import { Upload, FileText, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getBlogs, createBlog, BlogPost } from "@/api/blogsApi";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { getBlogs, createBlog, deleteBlog, BlogPost } from "@/api/blogsApi";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +22,8 @@ const Blogs = () => {
   const [dragActive, setDragActive] = useState(false);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingPost, setDeletingPost] = useState<BlogPost | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     loadBlogs();
@@ -85,6 +97,25 @@ const Blogs = () => {
     }
   };
 
+  const handleDeleteClick = (post: BlogPost) => {
+    setDeletingPost(post);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingPost) return;
+
+    const { error } = await deleteBlog(deletingPost.id);
+    if (error) {
+      toast({ title: "Error", description: error, variant: "destructive" });
+    } else {
+      toast({ title: "Blog deleted", description: `"${deletingPost.title}" has been deleted.` });
+      loadBlogs();
+    }
+    setIsDeleteDialogOpen(false);
+    setDeletingPost(null);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -124,32 +155,62 @@ const Blogs = () => {
         </div>
 
         <div className="lg:col-span-2 space-y-4">
-          <h3 className="font-semibold text-lg">Recent Posts</h3>
-          {posts.map((post) => (
-            <Card key={post.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-0 flex flex-col sm:flex-row h-full">
-                <div className="sm:w-48 h-48 sm:h-auto bg-gray-100 shrink-0">
-                  <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
-                </div>
-                <div className="p-4 flex flex-col flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">{post.category}</span>
-                    <span className="text-xs text-muted-foreground">{post.date}</span>
+          <h3 className="font-semibold text-lg">All Posts</h3>
+          {posts.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">No blog posts yet. Upload your first post!</p>
+          ) : (
+            posts.map((post) => (
+              <Card key={post.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="p-0 flex flex-col sm:flex-row h-full">
+                  <div className="sm:w-48 h-48 sm:h-auto bg-gray-100 shrink-0">
+                    <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
                   </div>
-                  <h4 className="font-bold text-lg mb-1 line-clamp-1">{post.title}</h4>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">{post.excerpt}</p>
-                  <div className="flex items-center justify-between mt-auto pt-2 border-t">
-                    <span className="text-xs text-muted-foreground flex items-center">
-                      <FileText className="h-3 w-3 mr-1" />{post.readTime}
-                    </span>
-                    <Button variant="ghost" size="sm" className="h-8 text-xs">Edit Post</Button>
+                  <div className="p-4 flex flex-col flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">{post.category}</span>
+                      <span className="text-xs text-muted-foreground">{post.date}</span>
+                    </div>
+                    <h4 className="font-bold text-lg mb-1 line-clamp-1">{post.title}</h4>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">{post.excerpt}</p>
+                    <div className="flex items-center justify-between mt-auto pt-2 border-t">
+                      <span className="text-xs text-muted-foreground flex items-center">
+                        <FileText className="h-3 w-3 mr-1" />{post.readTime}
+                      </span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDeleteClick(post)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete "{deletingPost?.title}". This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeletingPost(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
