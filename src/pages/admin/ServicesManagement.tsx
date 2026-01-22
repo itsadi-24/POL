@@ -30,9 +30,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Pencil, Trash2, Wrench, Monitor, Cpu, Truck, HardDrive, Network } from 'lucide-react';
+import { Plus, Pencil, Trash2, Wrench, Monitor, Cpu, Truck, HardDrive, Network, ArrowUp, ArrowDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { getServices, createService, updateService, deleteService, type Service } from '@/api/servicesApi';
+import { getServices, createService, updateService, patchService, deleteService, type Service } from '@/api/servicesApi';
 
 const iconOptions = [
   { value: 'Wrench', label: 'Wrench', icon: Wrench },
@@ -186,7 +186,7 @@ const ServicesManagement = () => {
 
   const handleToggleEnabled = async (service: Service) => {
     try {
-      await updateService(service.id, { enabled: !service.enabled });
+      await patchService(service.id, { enabled: !service.enabled });
       await fetchServices();
       toast({
         title: 'Service Updated',
@@ -211,8 +211,9 @@ const ServicesManagement = () => {
     const targetService = services[targetIndex];
 
     try {
-      await updateService(service.id, { order: targetService.order });
-      await updateService(targetService.id, { order: service.order });
+      // Use patchService for partial updates to avoid data corruption
+      await patchService(service.id, { order: targetService.order });
+      await patchService(targetService.id, { order: service.order });
       await fetchServices();
     } catch (error) {
       toast({
@@ -261,7 +262,7 @@ const ServicesManagement = () => {
         <CardHeader>
           <CardTitle>All Services</CardTitle>
           <CardDescription>
-            {services.length} service{services.length !== 1 ? 's' : ''} configured
+            {services.length} service{services.length !== 1 ? 's' : ''} configured · Use ↑↓ arrows to reorder
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -272,6 +273,30 @@ const ServicesManagement = () => {
               
               return (
                 <div key={service.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-slate-50 transition-colors">
+                  {/* Reorder Buttons */}
+                  <div className="flex flex-col gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 p-0"
+                      onClick={() => handleMoveOrder(service, 'up')}
+                      disabled={index === 0}
+                      title="Move up"
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 p-0"
+                      onClick={() => handleMoveOrder(service, 'down')}
+                      disabled={index === services.length - 1}
+                      title="Move down"
+                    >
+                      <ArrowDown className="h-4 w-4" />
+                    </Button>
+                  </div>
+
                   <div className={`h-12 w-12 rounded-lg ${colorClass} flex items-center justify-center text-white flex-shrink-0`}>
                     <IconComponent className="h-6 w-6" />
                   </div>

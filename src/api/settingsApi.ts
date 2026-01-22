@@ -5,6 +5,7 @@ export interface Settings {
   showSidebar: boolean;
   enableTicketing: boolean;
   maintenanceMode: boolean;
+  headlines: string[];
 }
 
 export const getSettings = () => get<Settings>('settings');

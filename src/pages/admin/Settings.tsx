@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Save } from "lucide-react";
+import { Save, Plus, X, GripVertical, Pencil } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/contexts/SettingsContext";
 
@@ -16,9 +17,13 @@ const Settings = () => {
     showSidebar: true,
     enableTicketing: true,
     maintenanceMode: false,
+    headlines: [] as string[],
   });
 
   const [saving, setSaving] = useState(false);
+  const [newHeadline, setNewHeadline] = useState("");
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingText, setEditingText] = useState("");
 
   // Load settings from context when available
   useEffect(() => {
@@ -47,6 +52,59 @@ const Settings = () => {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAddHeadline = () => {
+    if (newHeadline.trim()) {
+      setSettings((prev) => ({
+        ...prev,
+        headlines: [...prev.headlines, newHeadline.trim()],
+      }));
+      setNewHeadline("");
+    }
+  };
+
+  const handleDeleteHeadline = (index: number) => {
+    setSettings((prev) => ({
+      ...prev,
+      headlines: prev.headlines.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleStartEdit = (index: number) => {
+    setEditingIndex(index);
+    setEditingText(settings.headlines[index]);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingIndex !== null && editingText.trim()) {
+      setSettings((prev) => ({
+        ...prev,
+        headlines: prev.headlines.map((h, i) => 
+          i === editingIndex ? editingText.trim() : h
+        ),
+      }));
+      setEditingIndex(null);
+      setEditingText("");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIndex(null);
+    setEditingText("");
+  };
+
+  const handleMoveHeadline = (index: number, direction: 'up' | 'down') => {
+    const newHeadlines = [...settings.headlines];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    
+    if (newIndex >= 0 && newIndex < newHeadlines.length) {
+      [newHeadlines[index], newHeadlines[newIndex]] = [newHeadlines[newIndex], newHeadlines[index]];
+      setSettings((prev) => ({
+        ...prev,
+        headlines: newHeadlines,
+      }));
     }
   };
 
@@ -102,6 +160,126 @@ const Settings = () => {
           {saving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
+
+      {/* Headlines Management */}
+      <Card className="border-0 shadow-sm">
+        <CardHeader>
+          <CardTitle>Scrolling Headlines</CardTitle>
+          <CardDescription>
+            Manage the messages that appear in the scrolling headline banner
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Add New Headline */}
+          <div className="flex gap-2">
+            <Input
+              placeholder="Enter a new headline (e.g., 🔥 Special offer: 20% off!)"
+              value={newHeadline}
+              onChange={(e) => setNewHeadline(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleAddHeadline()}
+              className="flex-1"
+            />
+            <Button onClick={handleAddHeadline} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add
+            </Button>
+          </div>
+
+          {/* Headlines List */}
+          <div className="space-y-2">
+            {settings.headlines.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                No headlines added yet. Add your first headline above.
+              </p>
+            ) : (
+              settings.headlines.map((headline, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg border border-slate-200"
+                >
+                  {/* Drag Handle */}
+                  <div className="flex flex-col gap-0.5">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5 p-0"
+                      onClick={() => handleMoveHeadline(index, 'up')}
+                      disabled={index === 0}
+                    >
+                      <GripVertical className="h-3 w-3 rotate-180" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5 p-0"
+                      onClick={() => handleMoveHeadline(index, 'down')}
+                      disabled={index === settings.headlines.length - 1}
+                    >
+                      <GripVertical className="h-3 w-3" />
+                    </Button>
+                  </div>
+
+                  {/* Headline Text or Edit Field */}
+                  {editingIndex === index ? (
+                    <Input
+                      value={editingText}
+                      onChange={(e) => setEditingText(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
+                      className="flex-1"
+                      autoFocus
+                    />
+                  ) : (
+                    <span className="flex-1 text-sm">{headline}</span>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-1">
+                    {editingIndex === index ? (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-green-600 hover:text-green-700"
+                          onClick={handleSaveEdit}
+                        >
+                          <Save className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-slate-600 hover:text-slate-700"
+                          onClick={handleCancelEdit}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-blue-600 hover:text-blue-700"
+                          onClick={() => handleStartEdit(index)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-red-600 hover:text-red-700"
+                          onClick={() => handleDeleteHeadline(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Feature Toggles */}
       <Card className="border-0 shadow-sm">

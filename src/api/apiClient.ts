@@ -48,6 +48,20 @@ export async function put<T>(endpoint: string, body: any): Promise<ApiResponse<T
   }
 }
 
+export async function patch<T>(endpoint: string, body: any): Promise<ApiResponse<T>> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return handleResponse<T>(response);
+  } catch (error) {
+    return { data: null, error: "Network error. Please check if the server is running." };
+  }
+}
+
+
 export async function del<T>(endpoint: string): Promise<ApiResponse<T>> {
   try {
     const response = await fetch(`${API_BASE_URL}/${endpoint}`, {

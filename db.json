@@ -1,9 +1,17 @@
 {
   "settings": {
     "showScrollingHeadline": true,
-    "showSidebar": true,
-    "enableTicketing": true,
-    "maintenanceMode": false
+    "showSidebar": false,
+    "enableTicketing": false,
+    "maintenanceMode": false,
+    "headlines": [
+      "🔥 Special Offer: 20% off on all laptop repairs this week!",
+      "💻 New arrivals: Latest gaming laptops now in stock",
+      "🛠️ Free diagnostics on all hardware issues",
+      "⚡ Same-day repair service available",
+      "🎮 Custom PC builds starting from ₹35,000",
+      "📞 24/7 Support hotline: +91 98765 43210"
+    ]
   },
   "services": [
     {
@@ -20,7 +28,7 @@
       "price": "From ₹500",
       "color": "blue",
       "popular": true,
-      "order": 1,
+      "order": 2,
       "enabled": true
     },
     {
@@ -37,7 +45,7 @@
       "price": "From ₹300",
       "color": "emerald",
       "popular": false,
-      "order": 2,
+      "order": 1,
       "enabled": true
     },
     {

@@ -2,24 +2,21 @@ import { useState } from 'react';
 import { X, Zap } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { useSettings } from '@/contexts/SettingsContext';
 
 interface ScrollingHeadlineProps {
   enabled?: boolean;
 }
 
-const headlines = [
-  '🔥 Special Offer: 20% off on all laptop repairs this week!',
-  '💻 New arrivals: Latest gaming laptops now in stock',
-  '🛠️ Free diagnostics on all hardware issues',
-  '⚡ Same-day repair service available',
-  '🎮 Custom PC builds starting from ₹35,000',
-  '📞 24/7 Support hotline: +91 98765 43210',
-];
-
 export function ScrollingHeadline({ enabled = true }: ScrollingHeadlineProps) {
   const [isVisible, setIsVisible] = useState(true);
+  const { settings } = useSettings();
 
-  if (!enabled || !isVisible) return null;
+  // Get headlines from settings or use empty array
+  const headlines = settings?.headlines || [];
+
+  // Don't show if disabled, not visible, or no headlines
+  if (!enabled || !isVisible || headlines.length === 0) return null;
 
   return (
     <div className="relative overflow-hidden text-blue-900 shadow-sm">
