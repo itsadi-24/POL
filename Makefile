@@ -1,21 +1,14 @@
-.PHONY: help up down build logs clean dev dev-down prod prod-down restart status
+.PHONY: help up down build logs clean restart status shell-be shell-fe setup
 
 # Default target
 help:
 	@echo "POL Application - Docker Commands"
 	@echo "=================================="
 	@echo ""
-	@echo "Production Mode:"
-	@echo "  make prod          - Start production environment (frontend + backend)"
-	@echo "  make prod-down     - Stop production environment"
-	@echo "  make prod-build    - Build and start production environment"
-	@echo ""
-	@echo "Development Mode:"
-	@echo "  make dev           - Start development environment with hot-reload"
-	@echo "  make dev-down      - Stop development environment"
-	@echo "  make dev-build     - Build and start development environment"
-	@echo ""
-	@echo "General Commands:"
+	@echo "Commands:"
+	@echo "  make up            - Start the application"
+	@echo "  make down          - Stop the application"
+	@echo "  make build         - Build and start the application"
 	@echo "  make logs          - View logs from all services"
 	@echo "  make logs-be       - View backend logs only"
 	@echo "  make logs-fe       - View frontend logs only"
@@ -24,32 +17,20 @@ help:
 	@echo "  make clean         - Stop and remove all containers, networks, and volumes"
 	@echo "  make shell-be      - Open shell in backend container"
 	@echo "  make shell-fe      - Open shell in frontend container"
+	@echo "  make setup         - Create .env file from .env.example"
 
-# Production commands
-prod:
-	@echo "🚀 Starting production environment..."
+# Main commands
+up:
+	@echo "🚀 Starting application..."
 	docker compose up
 
-prod-down:
-	@echo "🛑 Stopping production environment..."
+down:
+	@echo "🛑 Stopping application..."
 	docker compose down
 
-prod-build:
-	@echo "🔨 Building and starting production environment..."
+build:
+	@echo "🔨 Building and starting application..."
 	docker compose up --build
-
-# Development commands
-dev:
-	@echo "🔧 Starting development environment..."
-	docker compose -f docker-compose.dev.yml up
-
-dev-down:
-	@echo "🛑 Stopping development environment..."
-	docker compose -f docker-compose.dev.yml down
-
-dev-build:
-	@echo "🔨 Building and starting development environment..."
-	docker compose -f docker-compose.dev.yml up --build
 
 # Utility commands
 logs:
@@ -72,7 +53,6 @@ restart:
 clean:
 	@echo "🧹 Cleaning up Docker resources..."
 	@docker compose down -v
-	@docker compose -f docker-compose.dev.yml down -v
 	@echo "✅ Cleanup complete!"
 
 shell-be:

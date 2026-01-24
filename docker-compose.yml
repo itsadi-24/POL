@@ -1,11 +1,11 @@
-version: '3.8'
-
 services:
   # Backend Service
   backend:
     build:
       context: ./POL_BE
       dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
     container_name: pol-backend
     restart: unless-stopped
     ports:
@@ -34,6 +34,7 @@ services:
       context: ./POL_FE
       dockerfile: Dockerfile
       args:
+        - NODE_ENV=production
         - VITE_API_URL=http://localhost:5000/api
     container_name: pol-frontend
     restart: unless-stopped
