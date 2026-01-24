@@ -18,7 +18,7 @@ services:
       - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
       - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
       - FRONTEND_URL=http://localhost:5173
-      - JWT_SECRET=${JWT_SECRET:-your-default-jwt-secret-change-this}
+      - JWT_SECRET=${JWT_SECRET}
     volumes:
       - ./POL_BE:/app
       - /app/node_modules

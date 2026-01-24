@@ -55,15 +55,6 @@ docker-compose -f docker-compose.dev.yml up
 docker-compose up -d
 ```
 
-### Option 3: One-Line Commands
-
-```bash
-# Production
-cd /home/adi-prasan/Desktop/POL-main && docker-compose up
-
-# Development
-cd /home/adi-prasan/Desktop/POL-main && docker-compose -f docker-compose.dev.yml up
-```
 
 ## Access Your Application
 
