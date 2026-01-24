@@ -1,10 +1,11 @@
 export interface Product {
-  id: number;
+  id: number | string;
   name: string;
   category: string;
   price: number;
   originalPrice?: number;
-  image: string;
+  images: string[];
+  image?: string; // Backward compatibility (virtual field from backend)
   badge?: string;
   inStock?: boolean;
   specs?: string[];
@@ -18,7 +19,7 @@ export const products: Product[] = [
     category: "laptops",
     price: 54999,
     originalPrice: 64999,
-    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80",
+    images: ["https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80"],
 
     badge: "Best Seller",
     inStock: true,
@@ -30,7 +31,7 @@ export const products: Product[] = [
     name: "Dell OptiPlex 3090 Desktop - Core i7, 16GB RAM",
     category: "desktops",
     price: 42500,
-    image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=800&q=80",
+    images: ["https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=800&q=80"],
 
     inStock: true,
     specs: ["Intel Core i7-10700", "16GB DDR4", "1TB HDD", "Windows 11 Pro"],
@@ -42,7 +43,7 @@ export const products: Product[] = [
     category: "accessories",
     price: 8999,
     originalPrice: 10999,
-    image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80",
+    images: ["https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80"],
 
     badge: "Sale",
     inStock: true,
@@ -54,7 +55,7 @@ export const products: Product[] = [
     name: "Samsung 27\" Curved Monitor - Full HD, 75Hz",
     category: "monitors",
     price: 18499,
-    image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80",
+    images: ["https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80"],
 
     inStock: true,
     specs: ["27\" Curved VA Panel", "1920x1080 FHD", "75Hz Refresh", "AMD FreeSync"],
@@ -66,7 +67,7 @@ export const products: Product[] = [
     category: "laptops",
     price: 89999,
     originalPrice: 99999,
-    image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80",
+    images: ["https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80"],
 
     badge: "Gaming",
     inStock: true,
@@ -78,7 +79,7 @@ export const products: Product[] = [
     name: "Intel Core i5-12400F Processor",
     category: "components",
     price: 15999,
-    image: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80",
+    images: ["https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=800&q=80"],
 
     inStock: true,
     specs: ["6 Cores, 12 Threads", "2.5GHz Base Clock", "4.4GHz Boost", "LGA 1700"],
@@ -89,7 +90,7 @@ export const products: Product[] = [
     name: "TP-Link Archer AX50 WiFi 6 Router",
     category: "networking",
     price: 7499,
-    image: "https://images.unsplash.com/photo-1544244015-9c72362c2122?auto=format&fit=crop&w=800&q=80",
+    images: ["https://images.unsplash.com/photo-1544244015-9c72362c2122?auto=format&fit=crop&w=800&q=80"],
 
     inStock: true,
     specs: ["WiFi 6 AX3000", "Dual Band", "OFDMA", "4 Gigabit Ports"],
@@ -100,7 +101,7 @@ export const products: Product[] = [
     name: "HP LaserJet Pro MFP Printer",
     category: "printers",
     price: 24999,
-    image: "https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?auto=format&fit=crop&w=800&q=80",
+    images: ["https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?auto=format&fit=crop&w=800&q=80"],
 
     badge: "New",
     inStock: false,

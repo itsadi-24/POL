@@ -82,7 +82,7 @@ export function FeaturedProducts() {
               <div className="relative aspect-[4/5] bg-secondary/30 overflow-hidden">
                 <Link to={`/product/${product.id}`}>
                   <img
-                    src={product.image}
+                    src={product.images?.[0] || product.image || 'https://via.placeholder.com/400'}
                     alt={product.name}
                     className="w-full h-full object-cover mix-blend-multiply opacity-95 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500 ease-in-out cursor-pointer"
                   />

@@ -53,10 +53,10 @@ const Dashboard = () => {
   ];
 
   const quickActions = [
-    { label: "Add New Product", path: "/admin/products/new" },
-    { label: "Write Blog Post", path: "/admin/blog/new" },
+    { label: "Add New Product", path: "/admin/products" },
+    { label: "Write Blog Post", path: "/admin/blog" },
     { label: "View Tickets", path: "/admin/tickets" },
-    { label: "Edit Hero Section", path: "/admin/content/hero" },
+    { label: "Edit Moving Banner", path: "/admin/settings" },
   ];
 
   return (

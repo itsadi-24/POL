@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Plus, Search, Edit2, Trash2, MoreHorizontal, Loader2, Filter, ArrowUpDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Plus, Search, Edit2, Trash2, MoreHorizontal, Loader2, Filter, ArrowUpDown, Upload, X, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -53,14 +53,27 @@ const categories = [
   { id: "components", name: "Components" },
   { id: "networking", name: "Networking" },
   { id: "printers", name: "Printers" },
+  { id: "desktops", name: "Desktops" },
 ];
 
-const emptyProduct: Omit<Product, "id"> = {
+interface ProductFormData {
+  name: string;
+  category: string;
+  price: number;
+  originalPrice?: number;
+  images: string[];
+  badge?: string;
+  inStock: boolean;
+  specs: string[];
+  description: string;
+}
+
+const emptyFormData: ProductFormData = {
   name: "",
   category: "laptops",
   price: 0,
   originalPrice: undefined,
-  image: "",
+  images: [],
   badge: "",
   inStock: true,
   specs: [],
@@ -69,6 +82,7 @@ const emptyProduct: Omit<Product, "id"> = {
 
 const Products = () => {
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -77,8 +91,11 @@ const Products = () => {
   const [sortBy, setSortBy] = useState<"category" | "price-low" | "price-high" | "status">("category");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState<Omit<Product, "id"> & { id?: number }>(emptyProduct);
+  const [formData, setFormData] = useState<ProductFormData>(emptyFormData);
   const [specsInput, setSpecsInput] = useState("");
+  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   useEffect(() => {
     loadProducts();
@@ -119,20 +136,83 @@ const Products = () => {
 
   const openAddDialog = () => {
     setEditingProduct(null);
-    setFormData({ ...emptyProduct });
+    setFormData({ ...emptyFormData });
     setSpecsInput("");
+    setNewImageFiles([]);
+    setImagePreviewUrls([]);
     setIsDialogOpen(true);
   };
 
   const openEditDialog = (product: Product) => {
     setEditingProduct(product);
-    setFormData({ ...product });
+    setFormData({
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      images: product.images || [],
+      badge: product.badge || "",
+      inStock: product.inStock ?? true,
+      specs: product.specs || [],
+      description: product.description,
+    });
     setSpecsInput(product.specs?.join(", ") || "");
+    setNewImageFiles([]);
+    setImagePreviewUrls([]);
     setIsDialogOpen(true);
   };
 
-  const handleInputChange = (field: keyof Product, value: any) => {
+  const handleInputChange = (field: keyof ProductFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const totalImages = formData.images.length + newImageFiles.length + files.length;
+    
+    if (totalImages > 5) {
+      toast({
+        title: "Too many images",
+        description: "A product can have at most 5 images",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create preview URLs for new files
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    setNewImageFiles((prev) => [...prev, ...files]);
+    setImagePreviewUrls((prev) => [...prev, ...newPreviews]);
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const removeExistingImage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  const removeNewImage = (index: number) => {
+    // Revoke the object URL to prevent memory leaks
+    URL.revokeObjectURL(imagePreviewUrls[index]);
+    setNewImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviewUrls((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const moveImage = (fromIndex: number, direction: 'up' | 'down') => {
+    const toIndex = direction === 'up' ? fromIndex - 1 : fromIndex + 1;
+    if (toIndex < 0 || toIndex >= formData.images.length) return;
+    
+    setFormData((prev) => {
+      const newImages = [...prev.images];
+      [newImages[fromIndex], newImages[toIndex]] = [newImages[toIndex], newImages[fromIndex]];
+      return { ...prev, images: newImages };
+    });
   };
 
   const handleSave = async () => {
@@ -142,15 +222,24 @@ const Products = () => {
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
 
-    const productData = {
-      ...formData,
-      specs: specsArray,
+    const productData: Omit<Product, "id"> = {
+      name: formData.name,
+      category: formData.category,
       price: Number(formData.price),
       originalPrice: formData.originalPrice ? Number(formData.originalPrice) : undefined,
+      images: formData.images,
+      badge: formData.badge || undefined,
+      inStock: formData.inStock,
+      specs: specsArray,
+      description: formData.description,
     };
 
     if (editingProduct) {
-      const { error } = await updateProduct(editingProduct.id, { ...productData, id: editingProduct.id } as Product);
+      const { error } = await updateProduct(
+        editingProduct.id, 
+        { ...productData, id: editingProduct.id } as Product,
+        newImageFiles.length > 0 ? newImageFiles : undefined
+      );
       if (error) {
         toast({ title: "Error", description: error, variant: "destructive" });
       } else {
@@ -158,7 +247,10 @@ const Products = () => {
         loadProducts();
       }
     } else {
-      const { error } = await createProduct(productData);
+      const { error } = await createProduct(
+        productData,
+        newImageFiles.length > 0 ? newImageFiles : undefined
+      );
       if (error) {
         toast({ title: "Error", description: error, variant: "destructive" });
       } else {
@@ -170,10 +262,12 @@ const Products = () => {
     setSaving(false);
     setIsDialogOpen(false);
     setEditingProduct(null);
-    setFormData(emptyProduct);
+    setFormData(emptyFormData);
+    setNewImageFiles([]);
+    setImagePreviewUrls([]);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number | string) => {
     const { error } = await deleteProduct(id);
     if (error) {
       toast({ title: "Error", description: error, variant: "destructive" });
@@ -183,6 +277,14 @@ const Products = () => {
     }
   };
 
+  // Get primary image for display
+  const getProductImage = (product: Product) => {
+    if (product.images && product.images.length > 0) {
+      return product.images[0];
+    }
+    return product.image || "https://via.placeholder.com/80";
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -190,6 +292,9 @@ const Products = () => {
       </div>
     );
   }
+
+  const totalImagesCount = formData.images.length + newImageFiles.length;
+  const canAddMoreImages = totalImagesCount < 5;
 
   return (
     <div className="space-y-8">
@@ -250,6 +355,7 @@ const Products = () => {
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
+              <TableHead>Images</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -259,7 +365,7 @@ const Products = () => {
               <TableRow key={product.id}>
                 <TableCell>
                   <div className="h-10 w-10 rounded-md overflow-hidden bg-secondary">
-                    <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+                    <img src={getProductImage(product)} alt={product.name} className="h-full w-full object-cover" />
                   </div>
                 </TableCell>
                 <TableCell className="font-medium">
@@ -267,6 +373,9 @@ const Products = () => {
                 </TableCell>
                 <TableCell className="capitalize">{product.category}</TableCell>
                 <TableCell>₹{product.price.toLocaleString()}</TableCell>
+                <TableCell>
+                  <Badge variant="outline">{product.images?.length || 0} / 5</Badge>
+                </TableCell>
                 <TableCell>
                   <Badge variant={product.inStock ? "default" : "destructive"}>
                     {product.inStock ? "In Stock" : "Out of Stock"}
@@ -293,7 +402,7 @@ const Products = () => {
             ))}
             {sortedProducts.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">No products found.</TableCell>
+                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">No products found.</TableCell>
               </TableRow>
             )}
           </TableBody>
@@ -342,12 +451,106 @@ const Products = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="image">Image URL *</Label>
-              <Input id="image" value={formData.image} onChange={(e) => handleInputChange("image", e.target.value)} placeholder="https://..." />
-              {formData.image && (
-                <div className="mt-2 h-32 w-32 rounded-lg overflow-hidden border">
-                  <img src={formData.image} alt="Preview" className="h-full w-full object-cover" onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/128")} />
+            {/* Image Upload Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Product Images ({totalImagesCount}/5)</Label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  multiple
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={!canAddMoreImages}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Add Images
+                </Button>
+              </div>
+              
+              {/* Existing Images */}
+              {formData.images.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Existing Images</p>
+                  <div className="grid grid-cols-5 gap-2">
+                    {formData.images.map((url, index) => (
+                      <div key={`existing-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border bg-secondary">
+                        <img src={url} alt={`Product ${index + 1}`} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-white hover:text-white hover:bg-white/20"
+                            onClick={() => moveImage(index, 'up')}
+                            disabled={index === 0}
+                          >
+                            <GripVertical className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-white hover:text-destructive hover:bg-white/20"
+                            onClick={() => removeExistingImage(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        {index === 0 && (
+                          <div className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded font-medium">
+                            Main
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* New Images (to be uploaded) */}
+              {imagePreviewUrls.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">New Images (will be uploaded)</p>
+                  <div className="grid grid-cols-5 gap-2">
+                    {imagePreviewUrls.map((url, index) => (
+                      <div key={`new-${index}`} className="relative group aspect-square rounded-lg overflow-hidden border bg-secondary border-dashed border-primary/30">
+                        <img src={url} alt={`New ${index + 1}`} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-white hover:text-destructive hover:bg-white/20"
+                            onClick={() => removeNewImage(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <div className="absolute bottom-1 left-1 bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
+                          New
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {totalImagesCount === 0 && (
+                <div 
+                  className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">Click to upload images (max 5)</p>
+                  <p className="text-xs text-muted-foreground mt-1">JPEG, PNG, WebP, GIF up to 5MB each</p>
                 </div>
               )}
             </div>

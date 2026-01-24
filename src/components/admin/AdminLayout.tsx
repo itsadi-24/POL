@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Settings,
@@ -8,21 +8,19 @@ import {
   ShoppingBag,
   HeadphonesIcon,
   BookOpen,
-  Lock,
+  LogOut,
   Wrench,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-
-const ADMIN_PIN = "1234"; // temporary PIN
+import { useAuth } from "@/contexts/AuthContext";
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [pin, setPin] = useState("");
-  const [authenticated, setAuthenticated] = useState(false);
-  const [error, setError] = useState("");
-
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const mainNavItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
@@ -35,54 +33,11 @@ const AdminLayout = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const handleSubmitPin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pin === ADMIN_PIN) {
-      setAuthenticated(true);
-      setError("");
-    } else {
-      setError("Invalid PIN. Please try again.");
-    }
+  const handleLogout = () => {
+    logout();
+    navigate('/admin/login');
   };
 
-  // PIN gate: show this until authenticated
-  if (!authenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
-        <div className="bg-white border border-slate-200 rounded-xl shadow-md px-6 py-8 w-full max-w-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <Lock className="h-5 w-5 text-blue-600" />
-            <h1 className="text-lg font-semibold text-slate-900">
-              Admin Access
-            </h1>
-          </div>
-          <p className="text-xs text-slate-600 mb-4">
-            This section is restricted. Enter the admin PIN to continue.
-          </p>
-          <form onSubmit={handleSubmitPin} className="space-y-3">
-            <input
-              type="password"
-              value={pin}
-              onChange={(e) => setPin(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter admin PIN"
-              autoFocus
-            />
-            {error && (
-              <p className="text-xs text-red-600" aria-live="polite">
-                {error}
-              </p>
-            )}
-            <Button type="submit" className="w-full">
-              Continue
-            </Button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  // Normal admin layout once PIN is validated
   return (
     <div className="h-screen flex overflow-hidden bg-background">
       {/* Sidebar - Fixed */}
@@ -136,6 +91,43 @@ const AdminLayout = () => {
             })}
           </div>
         </nav>
+
+        {/* User info and logout at bottom */}
+        {sidebarOpen && (
+          <div className="px-2 py-3 border-t border-border flex-shrink-0">
+            <div className="flex items-center gap-2 px-2 py-2 mb-2 rounded-md bg-secondary/50">
+              <User className="h-4 w-4 text-muted-foreground" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-foreground truncate">
+                  {user?.username || 'Admin'}
+                </p>
+                <p className="text-xs text-muted-foreground capitalize">
+                  {user?.role || 'admin'}
+                </p>
+              </div>
+            </div>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              size="sm"
+              className="w-full text-xs"
+            >
+              <LogOut className="h-3 w-3 mr-2" />
+              Logout
+            </Button>
+          </div>
+        )}
+        {!sidebarOpen && (
+          <div className="px-2 py-3 border-t border-border flex-shrink-0">
+            <button
+              onClick={handleLogout}
+              className="w-full p-2 rounded-md hover:bg-destructive/10 text-destructive flex items-center justify-center"
+              title="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
+        )}
       </aside>
 
       {/* Main content - Scrollable */}
@@ -153,9 +145,9 @@ const AdminLayout = () => {
             </div>
             <Link
               to="/"
-              className="text-xs text-muted-foreground hover:text-primary"
+              className="text-xs text-muted-foreground font-bold hover:text-primary"
             >
-              ← Back to website
+              Back to website
             </Link>
           </div>
         </div>
@@ -172,3 +164,4 @@ const AdminLayout = () => {
 };
 
 export default AdminLayout;
+

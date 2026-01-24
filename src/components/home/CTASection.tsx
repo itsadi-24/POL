@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Laptop,
 } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 
 export function CTASection() {
   return (
@@ -86,7 +87,7 @@ export function CTASection() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <MessageCircle className="mr-2 h-5 w-5 text-emerald-600" />
+                  <FaWhatsapp className="mr-1 h-5 w-5 text-emerald-600" />
                   WhatsApp Us
                 </a>
               </Button>

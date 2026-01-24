@@ -165,7 +165,7 @@ const Sales = () => {
               >
                 <div className={cn("relative bg-secondary overflow-hidden", viewMode === "grid" ? "aspect-square" : "w-48 shrink-0")}>
                   <Link to={`/product/${product.id}`} className="block w-full h-full">
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer" />
+                    <img src={product.images?.[0] || product.image || 'https://via.placeholder.com/400'} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer" />
                   </Link>
                   {product.badge && (
                     <Badge className={cn("absolute top-3 left-3", product.badge === "Sale" ? "bg-destructive" : product.badge === "Gaming" ? "bg-purple-600" : "bg-primary")}>
