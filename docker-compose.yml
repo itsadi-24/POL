@@ -1,11 +1,12 @@
 services:
   # Backend Service
   backend:
-    build:
-      context: ./POL_BE
-      dockerfile: Dockerfile
-      args:
-        - NODE_ENV=production
+    # build:
+    #   context: ./POL_BE
+    #   dockerfile: Dockerfile
+    #   args:
+    #     - NODE_ENV=production
+    image: itsadi24/pol-backend:latest
     container_name: pol-backend
     restart: unless-stopped
     ports:
@@ -17,7 +18,7 @@ services:
       - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
       - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
       - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
-      - FRONTEND_URL=http://localhost:3000
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
       - JWT_SECRET=${JWT_SECRET}
     networks:
       - pol-network
@@ -30,12 +31,13 @@ services:
 
   # Frontend Service
   frontend:
-    build:
-      context: ./POL_FE
-      dockerfile: Dockerfile
-      args:
-        - NODE_ENV=production
-        - VITE_API_URL=http://localhost:5000/api
+    # build:
+    #   context: ./POL_FE
+    #   dockerfile: Dockerfile
+    #   args:
+    #     - NODE_ENV=production
+    #     - VITE_API_URL=${VITE_API_URL:-http://localhost:5000/api}
+    image: itsadi24/pol-frontend:latest
     container_name: pol-frontend
     restart: unless-stopped
     ports:
