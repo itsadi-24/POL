@@ -1,10 +1,10 @@
 services:
   client:
-    build:
-      context: ./POL_FE
-      dockerfile: Dockerfile
+    # build:
+    #   context: ./POL_FE
+    #   dockerfile: Dockerfile
     container_name: client
-    # image: iqbalcodes6602/thinkshare-client:latest
+    image: itsadi24/pol-main-client:latest
     ports:
       - "80"
     environment:
@@ -13,23 +13,30 @@ services:
       - server
 
   server:
-    build:
-      context: ./POL_BE
-      dockerfile: Dockerfile
+    # build:
+    #   context: ./POL_BE
+    #   dockerfile: Dockerfile
     container_name: server
-    # image: iqbalcodes6602/thinkshare-server:latest
+    image: itsadi24/pol-main-server:latest
     ports:
       - "5000"
     environment:
       - MONGODB_URI=mongodb+srv://adi:hkTkrpfGe0PvmgIZ@cluster0.wb5mgsa.mongodb.net/pol_database?retryWrites=true&w=majority
       - PORT=5000
+      - NODE_ENV=production
+      - CLOUDINARY_CLOUD_NAME=dqqf94yxo
+      - CLOUDINARY_API_KEY=723895915914125
+      - CLOUDINARY_API_SECRET=SH6e8hyXWRglIENUY4xA-s_Lfs0
+      - JWT_SECRET=ea8aca9708a6b30f345a18434d6ddb8a
+      - JWT_EXPIRES_IN=7d
+      - FRONTEND_URL=http://localhost:80
 
   proxy:
-    build:
-      context: ./proxy
-      dockerfile: Dockerfile
+    # build:
+    #   context: ./proxy
+    #   dockerfile: Dockerfile
     container_name: proxy
-    # image: iqbalcodes6602/thinkshare-proxy:latest
+    image: itsadi24/pol-main-proxy:latest
     ports:
       - "80:80"
     depends_on:
