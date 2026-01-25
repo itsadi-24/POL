@@ -1,9 +1,7 @@
 // API Base URL - switch between json-server and Node.js backend
 const USE_NEW_BACKEND = true; // Set to true to use the new Node.js backend
-
-const API_BASE_URL = USE_NEW_BACKEND 
-  ? "http://localhost:5000/api" 
-  : "http://localhost:3001";
+``
+const API_BASE_URL = "/api";
 
 export interface ApiResponse<T> {
   data: T | null;
