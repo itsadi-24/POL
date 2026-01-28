@@ -1,0 +1,36 @@
+name: Build & Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Frontend (POL_FE)
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-client:latest ./POL_FE
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-client:latest
+
+      - name: Build & Push Backend (POL_BE)
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-server:latest ./POL_BE
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-server:latest
+
+      - name: Build & Push Proxy
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-proxy:latest ./proxy
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-proxy:latest
