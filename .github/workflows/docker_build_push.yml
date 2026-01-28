@@ -22,15 +22,15 @@ jobs:
 
       - name: Build & Push Frontend (POL_FE)
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-client:latest ./POL_FE
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-client:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pol-client:latest ./POL_FE
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pol-client:latest
 
       - name: Build & Push Backend (POL_BE)
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-server:latest ./POL_BE
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-server:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pol-server:latest ./POL_BE
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pol-server:latest
 
       - name: Build & Push Proxy
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-proxy:latest ./proxy
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pol-main-proxy:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pol-proxy:latest ./proxy
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pol-proxy:latest
