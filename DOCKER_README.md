@@ -1,4 +1,4 @@
-# Docker Setup
+# Docker Setu
 
 ## Quick Start
 
