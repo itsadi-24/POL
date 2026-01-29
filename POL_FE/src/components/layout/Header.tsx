@@ -49,7 +49,7 @@ export function Header() {
                 className="flex items-center gap-2 hover:text-blue-100 transition-colors font-medium"
               >
                 <Phone className="h-4 w-4" />
-                <span>+91 98538 39432</span>
+                <span>+91 987654321</span>
               </a>
               <a
                 href="mailto:mail@paradiponline.com"
@@ -101,7 +101,7 @@ export function Header() {
                   'px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200',
                   location.pathname === item.href
                     ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-slate-700 hover:bg-blue-50 hover:text-blue-700'
+                    : 'text-slate-700 hover:bg-blue-50 hover:text-blue-700',
                 )}
               >
                 {item.name}
@@ -200,7 +200,7 @@ export function Header() {
                     'px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200',
                     location.pathname === item.href
                       ? 'bg-blue-600 text-white shadow-md'
-                      : 'text-slate-700 hover:bg-blue-50'
+                      : 'text-slate-700 hover:bg-blue-50',
                   )}
                 >
                   {item.name}
